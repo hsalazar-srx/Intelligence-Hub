@@ -1,5 +1,21 @@
 {
-  "processed_video_ids": [],
-  "last_run": null,
-  "_note": "Auto-managed by scripts/youtube_tracker.py — do not edit manually"
+  "processed_video_ids": [
+    "QMfw8OqroDs",
+    "LE8iaF8neSk",
+    "mxPgcNbSacI",
+    "ssbHkYB0jYM",
+    "j-B8ymGWlIE",
+    "B6GJjvR6txg",
+    "zizoDORjmlQ",
+    "Cru804JMjPI",
+    "2_DPnzoiHaY",
+    "dUMsFQ8y3gM",
+    "z_NbVtbgBJw",
+    "5kHpeVvO7cY",
+    "abbeIUOCzmw",
+    "wzzh7Not8XE",
+    "1fUBWAETmkk"
+  ],
+  "last_run": "2026-03-09T07:32:53.818844Z",
+  "_note": "Auto-managed by scripts/youtube_tracker.py \u2014 do not edit manually"
 }
