@@ -27,6 +27,7 @@ Thumbs.db
 # ── Node ─────────────────────────────────────────────────────
 node_modules/
 npm-debug.log
+package-lock.json
 
 # ── Private drafts (prefix file with _ to keep local only) ───
 signals/_*
@@ -35,3 +36,6 @@ concepts/_*
 
 # ── Build artifacts (docs/ is committed — it IS the site) ────
 # docs/ is intentionally NOT ignored
+
+# All other .obsidian files are considered local and not shared, so we ignore the entire folder
+.obsidian/

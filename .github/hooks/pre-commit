@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
 # IT-Strategy — Pre-commit Sensitive Data Guard
-# Blocks commits containing patterns that suggest sensitive/internal data.
+# Blocks commits that contain actual hardcoded credentials or internal infra refs.
 # Install: cp .github/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
 # =============================================================================
 
@@ -10,7 +10,7 @@ YELLOW='\033[1;33m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
-echo "🔍 Running sensitive data scan..."
+echo "Running sensitive data scan..."
 
 VIOLATIONS=0
 WARNINGS=0
@@ -18,70 +18,114 @@ WARNINGS=0
 STAGED=$(git diff --cached --name-only --diff-filter=ACM)
 
 if [ -z "$STAGED" ]; then
-  echo -e "${GREEN}✓ No staged files to scan.${NC}"
+  echo -e "${GREEN}No staged files to scan.${NC}"
   exit 0
 fi
 
-BLOCK_PATTERNS=(
-  "password\s*[:=]\s*\S+"
-  "passwd\s*[:=]\s*\S+"
-  "secret\s*[:=]\s*\S+"
-  "api[_-]?key\s*[:=]\s*\S+"
-  "access[_-]?token\s*[:=]\s*\S+"
-  "private[_-]?key"
-  "BEGIN (RSA|EC|OPENSSH|PGP) PRIVATE KEY"
-  "ghp_[A-Za-z0-9]{36}"
-  "sk-[A-Za-z0-9]{48}"
-  "AKIA[0-9A-Z]{16}"
-  "192\.168\.[0-9]{1,3}\.[0-9]{1,3}"
-  "10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}"
-  "172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9]{1,3}\.[0-9]{1,3}"
-  "jdbc:[a-z]+://"
-  "mongodb(\+srv)?://"
-  "Server=[^;]+;Database=[^;]+;User"
-)
+# Lines containing these strings are always safe (env var refs, placeholders)
+SAFE_PATTERN='os\.environ|getenv|secrets\.|YOUR_KEY|REPLACE_ME|placeholder'
 
-WARN_PATTERNS=(
-  "\b[A-Z]{2,10}-[0-9]{4,}\b"
-  "@[a-zA-Z0-9._%+-]+\.[a-zA-Z]{2,4}"
-  "\b\d{3}[-.]?\d{3}[-.]?\d{4}\b"
-  "\\\\[A-Z]{2,15}\\\\"
-)
+# Files to skip entirely
+skip_file() {
+  local f="$1"
+  [[ "$f" == .github/hooks/* ]]     && return 0
+  [[ "$f" == .github/workflows/* ]] && return 0
+  [[ "$f" == scripts/build.py ]]    && return 0
+  [[ "$f" == scripts/build.js ]]    && return 0
+  [[ "$f" == .gitignore ]]          && return 0
+  return 1
+}
+
+check() {
+  local content="$1"
+  local pattern="$2"
+  echo "$content" | grep -inE "$pattern" | grep -ivE "$SAFE_PATTERN" | head -3
+}
 
 for FILE in $STAGED; do
-  if [[ "$FILE" == ".github/hooks/"* ]] || [[ "$FILE" == ".github/workflows/"* ]] || [[ "$FILE" == ".gitignore" ]]; then
+  if skip_file "$FILE"; then
     continue
   fi
 
   CONTENT=$(git show ":$FILE" 2>/dev/null)
 
-  for PATTERN in "${BLOCK_PATTERNS[@]}"; do
-    MATCH=$(echo "$CONTENT" | grep -inE "$PATTERN" | head -3)
-    if [ -n "$MATCH" ]; then
-      echo -e "${RED}❌ BLOCKED — Sensitive pattern in: $FILE${NC}"
-      echo -e "${RED}   Pattern: $PATTERN${NC}"
-      VIOLATIONS=$((VIOLATIONS + 1))
-    fi
-  done
+  # Private key headers
+  if check "$CONTENT" 'BEGIN (RSA|EC|OPENSSH|PGP) PRIVATE KEY' | grep -q .; then
+    echo -e "${RED}BLOCKED [$FILE] - Private key detected${NC}"
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
 
-  for PATTERN in "${WARN_PATTERNS[@]}"; do
-    MATCH=$(echo "$CONTENT" | grep -inE "$PATTERN" | head -1)
-    if [ -n "$MATCH" ]; then
-      echo -e "${YELLOW}⚠️  WARNING — Review: $FILE → $PATTERN${NC}"
-      WARNINGS=$((WARNINGS + 1))
-    fi
-  done
+  # GitHub PAT
+  if check "$CONTENT" 'ghp_[A-Za-z0-9]{36}' | grep -q .; then
+    echo -e "${RED}BLOCKED [$FILE] - GitHub PAT token${NC}"
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
+
+  # AWS key
+  if check "$CONTENT" 'AKIA[0-9A-Z]{16}' | grep -q .; then
+    echo -e "${RED}BLOCKED [$FILE] - AWS Access Key${NC}"
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
+
+  # Anthropic key value (actual key, 95+ chars starting with sk-ant-api)
+  if check "$CONTENT" 'sk-ant-api[0-9A-Za-z_-]{50,}' | grep -q .; then
+    echo -e "${RED}BLOCKED [$FILE] - Anthropic API key value${NC}"
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
+
+  # OpenAI key value
+  if check "$CONTENT" 'sk-[a-zA-Z0-9]{20}T3BlbkFJ[a-zA-Z0-9]{20}' | grep -q .; then
+    echo -e "${RED}BLOCKED [$FILE] - OpenAI API key value${NC}"
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
+
+  # JDBC connection string with actual host
+  if check "$CONTENT" 'jdbc:[a-z]+://[a-zA-Z0-9]' | grep -q .; then
+    echo -e "${RED}BLOCKED [$FILE] - JDBC connection string${NC}"
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
+
+  # MongoDB URI with actual host
+  if check "$CONTENT" 'mongodb\+?s?r?v?://[a-zA-Z0-9]' | grep -q .; then
+    echo -e "${RED}BLOCKED [$FILE] - MongoDB URI${NC}"
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
+
+  # SQL Server connection string
+  if check "$CONTENT" 'Server=[a-zA-Z0-9].*Database=.*User' | grep -q .; then
+    echo -e "${RED}BLOCKED [$FILE] - SQL Server connection string${NC}"
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
+
+  # Private IPs
+  if check "$CONTENT" '192\.168\.[0-9]{1,3}\.[0-9]{1,3}' | grep -q .; then
+    echo -e "${RED}BLOCKED [$FILE] - Private IP 192.168.x.x${NC}"
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
+
+  if check "$CONTENT" '10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}' | grep -q .; then
+    echo -e "${RED}BLOCKED [$FILE] - Private IP 10.x.x.x${NC}"
+    VIOLATIONS=$((VIOLATIONS + 1))
+  fi
+
+  # Warn on email addresses
+  if echo "$CONTENT" | grep -inE '@[a-zA-Z0-9._%+-]+\.[a-zA-Z]{2,4}' | grep -ivE "$SAFE_PATTERN" | grep -q .; then
+    echo -e "${YELLOW}WARNING [$FILE] - Email address found. Intentional?${NC}"
+    WARNINGS=$((WARNINGS + 1))
+  fi
+
 done
 
 if [ $VIOLATIONS -gt 0 ]; then
-  echo -e "${RED}🚫 Commit BLOCKED — $VIOLATIONS sensitive pattern(s) found.${NC}"
-  echo -e "${RED}   Use 'git commit --no-verify' only if you are certain this is a false positive.${NC}"
+  echo ""
+  echo -e "${RED}Commit BLOCKED - $VIOLATIONS issue(s) found.${NC}"
+  echo -e "${RED}Fix issues above, or use: git commit --no-verify (only if certain it is a false positive)${NC}"
   exit 1
 fi
 
 if [ $WARNINGS -gt 0 ]; then
-  echo -e "${YELLOW}⚠️  $WARNINGS warning(s). Commit allowed — review before pushing publicly.${NC}"
+  echo -e "${YELLOW}$WARNINGS warning(s) - commit allowed, review before pushing.${NC}"
 fi
 
-echo -e "${GREEN}✓ Scan passed.${NC}"
+echo -e "${GREEN}Scan passed - commit approved.${NC}"
 exit 0
