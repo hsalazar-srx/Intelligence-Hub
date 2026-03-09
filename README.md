@@ -1,4 +1,4 @@
-# IT Strategy — Intelligence Hub
+# Intelligence Hub
 
 > A living signal tracker and curated resource list for the IT/Digital Transformation team.
 > Focused on enterprise AI, MES modernization, M3/ERP integration, and AI platform strategy.
