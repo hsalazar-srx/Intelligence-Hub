@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IT Strategy — Intelligence Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --bg:#0d1117;--surface:#161b22;--border:#21262d;
+      --text:#e6edf3;--muted:#8b949e;
+      --font-sans:'IBM Plex Sans',sans-serif;
+      --font-mono:'IBM Plex Mono',monospace;
+    }
+    body{font-family:var(--font-sans);background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+    .shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+    .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:2rem 1.5rem;position:sticky;top:0;height:100vh;overflow-y:auto;display:flex;flex-direction:column;gap:2rem}
+    .logo{font-family:var(--font-mono);font-size:.75rem;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:1.5rem}
+    .logo strong{display:block;font-size:1rem;color:var(--text);letter-spacing:.05em;margin-bottom:.25rem}
+    .nav-section h4{font-family:var(--font-mono);font-size:.65rem;text-transform:uppercase;letter-spacing:.15em;color:var(--muted);margin-bottom:.75rem}
+    .nav-links{display:flex;flex-direction:column;gap:.25rem}
+    .nav-link{padding:.4rem .75rem;border-radius:6px;font-size:.875rem;color:var(--muted);cursor:pointer;transition:all .15s;border:none;background:none;text-align:left;width:100%}
+    .nav-link:hover,.nav-link.active{background:var(--border);color:var(--text)}
+    .stats{margin-top:auto;padding-top:1.5rem;border-top:1px solid var(--border)}
+    .stat{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:.75rem;color:var(--muted);padding:.2rem 0}
+    .stat span:last-child{color:var(--text)}
+    .main{padding:2.5rem 3rem;max-width:1100px}
+    .page{display:none}.page.active{display:block}
+    .page-header{margin-bottom:2.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+    .page-header h1{font-size:1.75rem;font-weight:600;letter-spacing:-.02em;margin-bottom:.5rem}
+    .page-header p{color:var(--muted);font-size:.9rem}
+    .filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem;align-items:center}
+    .filters-label{font-family:var(--font-mono);font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin-right:.5rem}
+    .filter-btn{padding:.35rem .9rem;border-radius:20px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:.8rem;cursor:pointer;transition:all .2s;font-family:var(--font-sans)}
+    .filter-btn:hover{border-color:var(--accent,#8b949e);color:var(--text)}
+    .filter-btn.active{background:color-mix(in srgb,var(--accent,#8b949e) 15%,transparent);border-color:var(--accent,#8b949e);color:var(--text)}
+    .search-bar{display:flex;align-items:center;gap:.75rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.6rem 1rem;margin-bottom:1.5rem}
+    .search-bar input{background:none;border:none;outline:none;color:var(--text);font-family:var(--font-sans);font-size:.9rem;width:100%}
+    .search-bar input::placeholder{color:var(--muted)}
+    .signals-grid{display:grid;gap:1rem}
+    .signal-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:1.5rem;transition:border-color .2s}
+    .signal-card:hover{border-color:#30363d}
+    .card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:.75rem;gap:1rem}
+    .card-meta{display:flex;align-items:center;gap:1rem}
+    .date{font-family:var(--font-mono);font-size:.75rem;color:var(--muted)}
+    .relevance{font-family:var(--font-mono);font-size:.7rem;font-weight:500;letter-spacing:.05em}
+    .card-tags{display:flex;gap:.4rem;flex-wrap:wrap}
+    .tag{padding:.2rem .6rem;border-radius:20px;font-size:.7rem;font-weight:500;letter-spacing:.03em;white-space:nowrap}
+    .card-title{font-size:1rem;font-weight:600;margin-bottom:.35rem;letter-spacing:-.01em}
+    .card-source{font-size:.8rem;color:var(--muted);margin-bottom:1rem;font-family:var(--font-mono)}
+    .card-content{font-size:.875rem;color:#c9d1d9;line-height:1.7}
+    .card-content h2,.card-content h3{font-size:.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin:1rem 0 .4rem;font-weight:600}
+    .card-content p{margin-bottom:.5rem}
+    .card-content ul{padding-left:1.2rem}
+    .card-content li{margin-bottom:.25rem}
+    .card-content code{background:#1f2937;padding:.1rem .3rem;border-radius:3px;font-family:var(--font-mono);font-size:.8rem}
+    .card-content pre{background:#1f2937;padding:1rem;border-radius:6px;overflow-x:auto;margin:.75rem 0}
+    .card-content pre code{background:none;padding:0}
+    .card-content table{width:100%;border-collapse:collapse;font-size:.82rem;margin:.75rem 0}
+    .card-content th{background:var(--bg);padding:.5rem .7rem;text-align:left;color:var(--muted);font-size:.75rem;text-transform:uppercase;border-bottom:1px solid var(--border)}
+    .card-content td{padding:.6rem .7rem;border-bottom:1px solid var(--border);vertical-align:top}
+    .card-content a{color:#0ea5e9;text-decoration:none}
+    .card-content a:hover{text-decoration:underline}
+    .empty-state{text-align:center;padding:4rem 2rem;color:var(--muted)}
+    .empty-icon{font-size:3rem;margin-bottom:1rem}
+    .empty-state h3{color:var(--text);margin-bottom:.5rem}
+    .empty-state code{background:var(--surface);padding:.1rem .4rem;border-radius:4px;font-family:var(--font-mono);font-size:.85rem}
+    .content-page{max-width:800px}
+    .content-page h1{font-size:1.5rem;font-weight:600;margin-bottom:1rem;letter-spacing:-.02em}
+    .content-page h2{font-size:1.1rem;margin:2rem 0 .75rem;color:var(--text);border-bottom:1px solid var(--border);padding-bottom:.5rem}
+    .content-page h3{font-size:.95rem;margin:1.5rem 0 .5rem}
+    .content-page table{width:100%;border-collapse:collapse;font-size:.85rem;margin-bottom:2rem}
+    .content-page th{background:var(--surface);padding:.6rem .8rem;text-align:left;font-weight:600;color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border)}
+    .content-page td{padding:.7rem .8rem;border-bottom:1px solid var(--border);vertical-align:top;color:#c9d1d9}
+    .content-page tr:hover td{background:var(--surface)}
+    .content-page a{color:#0ea5e9;text-decoration:none}
+    .content-page a:hover{text-decoration:underline}
+    .content-page p{font-size:.875rem;color:#c9d1d9;margin-bottom:.75rem}
+    .content-page ul,.content-page ol{padding-left:1.4rem;margin-bottom:1rem}
+    .content-page li{font-size:.875rem;color:#c9d1d9;margin-bottom:.3rem}
+    .content-page code{background:var(--surface);padding:.1rem .3rem;border-radius:3px;font-family:var(--font-mono);font-size:.82rem}
+    .content-page pre{background:#1f2937;padding:1rem;border-radius:6px;overflow-x:auto;margin:.75rem 0}
+    .content-page pre code{background:none}
+    .content-page strong{color:var(--text)}
+    .source-content{margin-bottom:3rem}
+    .build-info{font-family:var(--font-mono);font-size:.7rem;color:var(--muted);margin-top:3rem;padding-top:1rem;border-top:1px solid var(--border)}
+    .build-info a{color:var(--muted)}
+    @media(max-width:768px){.shell{grid-template-columns:1fr}.sidebar{position:static;height:auto}.main{padding:1.5rem}}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="logo"><strong>IT Strategy</strong>Intelligence Hub</div>
+    <nav class="nav-section">
+      <h4>Navigation</h4>
+      <div class="nav-links">
+        <button class="nav-link active" data-page="signals">📡 Signal Tracker</button>
+        <button class="nav-link" data-page="sources">📚 Sources & Accounts</button>
+        <button class="nav-link" data-page="projects">🗂️ Projects</button>
+        <button class="nav-link" data-page="concepts">💡 Concepts</button>
+      </div>
+    </nav>
+    <div class="nav-section">
+      <h4>Jump to Project</h4>
+      <div class="nav-links">
+        <button class="nav-link" data-page="signals" data-filter="digital-transformation">Digital Transformation</button>
+        <button class="nav-link" data-page="signals" data-filter="ai-platform">AI Platform</button>
+        <button class="nav-link" data-page="signals" data-filter="m3-erp-integration">M3 / ERP</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><span>Signals</span><span>1</span></div>
+      <div class="stat"><span>Projects</span><span>3</span></div>
+      <div class="stat"><span>Concepts</span><span>2</span></div>
+      <div class="stat"><span>Built</span><span>2026-03-09</span></div>
+    </div>
+  </aside>
+  <main class="main">
+    <div class="page active" id="page-signals">
+      <div class="page-header">
+        <h1>📡 Signal Tracker</h1>
+        <p>Curated insights filtered for manufacturing IT, ERP integration, and enterprise AI — tagged by project relevance.</p>
+      </div>
+      <div class="search-bar">
+        <span>🔍</span>
+        <input type="text" id="signal-search" placeholder="Search by keyword, source, or topic…">
+      </div>
+      <div class="filters">
+        <span class="filters-label">Project</span>
+        <button class="filter-btn active" data-filter="all" style="--accent:#8b949e">All Signals</button>
+<button class="filter-btn" data-filter="digital-transformation" style="--accent:#0ea5e9">Digital Transformation</button>
+<button class="filter-btn" data-filter="ai-platform" style="--accent:#8b5cf6">AI Platform</button>
+<button class="filter-btn" data-filter="m3-erp-integration" style="--accent:#10b981">M3 / ERP Integration</button>
+<button class="filter-btn" data-filter="general" style="--accent:#6b7280">General</button>
+
+      </div>
+      <div class="signals-grid" id="signals-grid">
+        
+<article class="signal-card" data-project="digital-transformation" data-tags="digital-transformation,ai-platform" data-relevance="high">
+  <div class="card-header">
+    <div class="card-meta">
+      <span class="date">2026-03-09</span>
+      <span class="relevance" style="color:#ef4444">● HIGH</span>
+    </div>
+    <div class="card-tags">
+      <span class="tag" style="background:#0ea5e922;color:#0ea5e9;border:1px solid #0ea5e944">Digital Transformation</span>
+      <span class="tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">AI Platform</span>
+    </div>
+  </div>
+  <h3 class="card-title">Composable MES validated by SME manufacturing adoption trends</h3>
+  <div class="card-source">📡 @GergelyOrosz / The Pragmatic Engineer + ByteByteGo</div>
+  <div class="card-content"><h2>Signal: Composable MES validated by SME manufacturing adoption trends</h2>
+<h3>What I read / watched</h3>
+The Pragmatic Engineer covered how platform teams at mid-size companies are moving away from monolithic vendor suites toward composable stacks — buying best-of-breed modules and integrating via APIs/events rather than accepting one vendor's full suite. ByteByteGo's system design content reinforced the event-driven integration patterns that make this viable.
+<h3>Why it matters to MY context</h3>
+This directly validates the hybrid composable recommendation in the MES strategy document. The pattern is not specific to software companies — it's being applied wherever legacy monoliths create bottlenecks. Our LabVIEW dependency is a textbook case. The migration path (strangler fig pattern — run old and new in parallel, progressively replace) is exactly how Phase 1→2 should be framed to leadership to reduce perceived risk.
+<h3>Action / Decision implication</h3>
+<ul><li><input type="checkbox" checked disabled> Already incorporated into MES strategy document</li>
+<li><input type="checkbox" disabled> Use Strangler Fig framing in leadership presentation — makes the phased approach feel less like a big-bang replacement</li>
+<li><input type="checkbox" disabled> Share with data team lead before the proposal meeting</li>
+</ul>
+<h3>Links</h3>
+<ul><li>Source: https://newsletter.pragmaticengineer.com</li>
+<li>Source: https://www.youtube.com/@ByteByteGo</li>
+<li>Related concept: [[composable-architecture]]</li>
+<li>Related project: [[mes-modernization]]</li>
+</ul></div>
+</article>
+      </div>
+    </div>
+    <div class="page" id="page-sources">
+      <div class="page-header">
+        <h1>📚 Sources & Accounts</h1>
+        <p>Curated Twitter/X accounts and YouTube channels for AI/LLM research, system design, and enterprise AI.</p>
+      </div>
+      <div class="content-page"><div class="source-content"><h1>🧠 AI, Systems & Enterprise Intelligence — Curated Resource List</h1>
+<p>> <strong>Purpose:</strong> A living reference for teams building toward an Organizational AI Platform. > Covers AI/LLM research, system design, ML engineering, and enterprise AI adoption. > Inspired by the community around <a href="https://twitter.com/barriocrypto" target="_blank">@barriocrypto</a> and accounts like Karpathy & natebjones.</p>
+<p>---</p>
+<p>> 📌 <strong>How to use this doc:</strong> > - Filter by category to find accounts relevant to your current focus > - Star/bookmark accounts as you discover new ones from the community > - Add new entries at the bottom of each section with the date discovered > - Each entry includes: handle, focus area, and why it matters for your AI platform work</p>
+<p>---</p>
+<h2>🐦 Twitter / X — Accounts to Follow</h2>
+<h3>🔬 AI & LLM Research</h3>
+<table><tr><th>Handle</th><th>Name</th><th>Focus</th><th>Why Follow</th></tr><tr><td><a href="https://twitter.com/karpathy" target="_blank">@karpathy</a></td><td>Andrej Karpathy</td><td>Deep learning, LLMs, neural nets</td><td>Former Tesla AI / OpenAI. Exceptional at explaining how LLMs work from first principles. Essential for understanding the stack you're building on.</td></tr><tr><td><a href="https://twitter.com/ylecun" target="_blank">@ylecun</a></td><td>Yann LeCun</td><td>Meta AI, foundational ML</td><td>Chief AI Scientist at Meta. Contrarian views on LLMs worth knowing. Strong on what AI can and cannot do.</td></tr><tr><td><a href="https://twitter.com/AnthropicAI" target="_blank">@AnthropicAI</a></td><td>Anthropic</td><td>Safety-focused LLMs</td><td>Builders of Claude. Follow for Constitutional AI, alignment research, and enterprise-safe model thinking.</td></tr><tr><td><a href="https://twitter.com/sama" target="_blank">@sama</a></td><td>Sam Altman</td><td>AI strategy & policy</td><td>OpenAI CEO. Signals where the frontier is heading commercially and politically.</td></tr><tr><td><a href="https://twitter.com/gdb" target="_blank">@gdb</a></td><td>Greg Brockman</td><td>OpenAI research & ops</td><td>OpenAI President. Practical ML deployment thinking from someone building at scale.</td></tr><tr><td><a href="https://twitter.com/RichardSocher" target="_blank">@RichardSocher</a></td><td>Richard Socher</td><td>NLP, enterprise AI</td><td>Former Salesforce Chief Scientist. Strong on applied NLP in business contexts.</td></tr><tr><td><a href="https://twitter.com/EMostaque" target="_blank">@EMostaque</a></td><td>Emad Mostaque</td><td>Open-source AI</td><td>Stability AI founder. Relevant for understanding open model ecosystem vs closed.</td></tr><tr><td><a href="https://twitter.com/hardmaru" target="_blank">@hardmaru</a></td><td>David Ha</td><td>Generative models, research</td><td>Google DeepMind. Curates great research threads.</td></tr><tr><td><a href="https://twitter.com/rasbt" target="_blank">@rasbt</a></td><td>Sebastian Raschka</td><td>LLMs, ML from scratch</td><td>Author of <em>Build a Large Language Model From Scratch</em>. Great technical depth with hands-on code.</td></tr><tr><td><a href="https://twitter.com/_akhaliq" target="_blank">@_akhaliq</a></td><td>AK</td><td>AI paper summaries</td><td>Posts new ArXiv papers daily. High signal for staying on top of what's published.</td></tr><tr><td><a href="https://twitter.com/DrJimFan" target="_blank">@DrJimFan</a></td><td>Jim Fan</td><td>Embodied AI, agents</td><td>NVIDIA. Strong on AI agents and multi-modal systems.</td></tr><tr><td><a href="https://twitter.com/cwolferesearch" target="_blank">@cwolferesearch</a></td><td>Cameron Wolfe</td><td>Deep learning deep dives</td><td>Research-quality threads that break down LLM internals accessibly.</td></tr></table>
+---
+<h3>🏗️ System Design & Architecture</h3>
+<table><tr><th>Handle</th><th>Name</th><th>Focus</th><th>Why Follow</th></tr><tr><td><a href="https://twitter.com/GergelyOrosz" target="_blank">@GergelyOrosz</a></td><td>Gergely Orosz</td><td>Engineering at scale</td><td>The Pragmatic Engineer. Covers how real systems are built at big tech — very applicable to AI platform design.</td></tr><tr><td><a href="https://twitter.com/alexa_adams" target="_blank">@alexa_adams</a></td><td>Alexa Adams</td><td>Data architecture</td><td>Data mesh, modern data stack. Relevant for building the data foundation under your AI platform.</td></tr><tr><td><a href="https://twitter.com/mipsytipsy" target="_blank">@mipsytipsy</a></td><td>Charity Majors</td><td>Observability, platform eng</td><td>CTO of Honeycomb. Crucial thinking on how to run and observe complex systems — apply to AI pipelines.</td></tr><tr><td><a href="https://twitter.com/kelseyhightower" target="_blank">@kelseyhightower</a></td><td>Kelsey Hightower</td><td>Cloud-native, Kubernetes</td><td>Google. The definitive voice on platform infrastructure. Relevant for running AI workloads at scale.</td></tr><tr><td><a href="https://twitter.com/wesmckinn" target="_blank">@wesmckinn</a></td><td>Wes McKinney</td><td>Data tooling (Pandas, Arrow)</td><td>Foundational for data layer of any AI platform.</td></tr><tr><td><a href="https://twitter.com/martinfowler" target="_blank">@martinfowler</a></td><td>Martin Fowler</td><td>Software architecture</td><td>Author of <em>Patterns of Enterprise Application Architecture</em>. Timeless design thinking for building durable platforms.</td></tr><tr><td><a href="https://twitter.com/neal_ford" target="_blank">@neal_ford</a></td><td>Neal Ford</td><td>Software architecture</td><td>ThoughtWorks. Deep on evolutionary architecture — key for a composable AI platform approach.</td></tr><tr><td><a href="https://twitter.com/swyx" target="_blank">@swyx</a></td><td>swyx (Shawn Wang)</td><td>AI engineering, DX</td><td>"AI Engineer" framing. Very relevant to your role — bridging dev and AI product in enterprise.</td></tr><tr><td><a href="https://twitter.com/simonw" target="_blank">@simonw</a></td><td>Simon Willison</td><td>LLM tooling, data apps</td><td>Creator of Datasette. Prolific builder of practical AI-powered tools. Excellent for implementation ideas.</td></tr></table>
+---
+<h3>🏢 Enterprise AI & Digital Transformation</h3>
+<table><tr><th>Handle</th><th>Name</th><th>Focus</th><th>Why Follow</th></tr><tr><td><a href="https://twitter.com/natebjones" target="_blank">@natebjones</a></td><td>Nate B. Jones</td><td>Enterprise AI adoption</td><td>Directly relevant: AI strategy in corporate/operational settings.</td></tr><tr><td><a href="https://twitter.com/adcock_brett" target="_blank">@adcock_brett</a></td><td>Brett Adcock</td><td>AI in manufacturing/robotics</td><td>Building AI-powered manufacturing at Figure. High relevance to your MES/manufacturing context.</td></tr><tr><td><a href="https://twitter.com/venturetwins" target="_blank">@venturetwins</a></td><td>Venture Twins</td><td>AI startup landscape</td><td>Great for understanding what's being built in the enterprise AI space.</td></tr><tr><td><a href="https://twitter.com/mmitchell_ai" target="_blank">@mmitchell_ai</a></td><td>Margaret Mitchell</td><td>AI ethics & governance</td><td>Critical for enterprise AI — responsible deployment thinking.</td></tr><tr><td><a href="https://twitter.com/benedictevans" target="_blank">@benedictevans</a></td><td>Benedict Evans</td><td>Tech strategy & macro trends</td><td>Analyst. Best for understanding AI's business implications at a strategic level.</td></tr><tr><td><a href="https://twitter.com/DanielMiessler" target="_blank">@DanielMiessler</a></td><td>Daniel Miessler</td><td>AI augmentation, security</td><td>Practical frameworks for integrating AI into organizations securely.</td></tr><tr><td><a href="https://twitter.com/Eric_Colson" target="_blank">@Eric_Colson</a></td><td>Eric Colson</td><td>ML in business</td><td>Stitch Fix. One of the best voices on how to structure an ML org inside a business.</td></tr><tr><td><a href="https://twitter.com/JeffDean" target="_blank">@JeffDean</a></td><td>Jeff Dean</td><td>Google AI research</td><td>Google DeepMind Chief Scientist. Follow for where large-scale AI infrastructure is heading.</td></tr><tr><td><a href="https://twitter.com/omarsar0" target="_blank">@omarsar0</a></td><td>Elvis Saravia</td><td>LLM prompting & evals</td><td>NLP Cloud. Excellent applied content on prompt engineering and model evaluation — critical for enterprise deployments.</td></tr><tr><td><a href="https://twitter.com/dair_ai" target="_blank">@dair_ai</a></td><td>DAIR.AI</td><td>AI education & research</td><td>High-quality democratized AI research. Great for team upskilling.</td></tr></table>
+---
+<h3>🔗 AI + Crypto / Web3 Intersection</h3>
+<em>(Community context: @barriocrypto crossover)</em>
+<table><tr><th>Handle</th><th>Name</th><th>Focus</th><th>Why Follow</th></tr><tr><td><a href="https://twitter.com/balajis" target="_blank">@balajis</a></td><td>Balaji Srinivasan</td><td>Network state, AI x crypto</td><td>Strong macro thinking on decentralized AI and data ownership — relevant for long-term AI platform strategy.</td></tr><tr><td><a href="https://twitter.com/naval" target="_blank">@naval</a></td><td>Naval Ravikant</td><td>Tech philosophy, AI futures</td><td>Mental models for leverage through AI.</td></tr><tr><td><a href="https://twitter.com/punk6529" target="_blank">@punk6529</a></td><td>punk6529</td><td>Decentralization, AI rights</td><td>Thinks rigorously about open vs closed AI ecosystems.</td></tr><tr><td><a href="https://twitter.com/laurashin" target="_blank">@laurashin</a></td><td>Laura Shin</td><td>Crypto journalism, tech</td><td>Unchained podcast. Good for understanding Web3 x AI narrative.</td></tr></table>
+---
+<h2>📺 YouTube Channels</h2>
+<h3>🔬 Deep Learning & LLM Research</h3>
+<table><tr><th>Channel</th><th>Focus</th><th>Best For</th></tr><tr><td><a href="https://www.youtube.com/@AndrejKarpathy" target="_blank">Andrej Karpathy</a></td><td>LLMs from scratch, neural nets</td><td><strong>Start here.</strong> His "Neural Networks: Zero to Hero" series is the best hands-on LLM education available.</td></tr><tr><td><a href="https://www.youtube.com/@3blue1brown" target="_blank">3Blue1Brown</a></td><td>Mathematical intuition</td><td>Transformers, attention mechanisms explained visually. Essential for your team to <em>understand</em> what they're deploying.</td></tr><tr><td><a href="https://www.youtube.com/@YannicKilcher" target="_blank">Yannic Kilcher</a></td><td>ML paper walkthroughs</td><td>Deep, technical breakdowns of landmark papers (GPT, BERT, etc).</td></tr><tr><td><a href="https://www.youtube.com/@TwoMinutePapers" target="_blank">Two Minute Papers</a></td><td>AI research summaries</td><td>Fast, accessible summaries of the latest research. Great for staying current.</td></tr><tr><td><a href="https://www.youtube.com/@umarjamilai" target="_blank">Umar Jamil</a></td><td>LLM coding from scratch</td><td>Implements transformers, RAG, and more in code. Very practical.</td></tr><tr><td><a href="https://www.youtube.com/@SebastianRaschka" target="_blank">Sebastian Raschka</a></td><td>LLM fundamentals</td><td>Companion to his book. Clear and rigorous.</td></tr></table>
+---
+<h3>🏗️ System Design & Engineering</h3>
+<table><tr><th>Channel</th><th>Focus</th><th>Best For</th></tr><tr><td><a href="https://www.youtube.com/@ByteByteGo" target="_blank">ByteByteGo</a></td><td>System design patterns</td><td>Concise visual explainers of how large-scale systems are built. Directly applicable to AI platform architecture.</td></tr><tr><td><a href="https://www.youtube.com/@Fireship" target="_blank">Fireship</a></td><td>Modern dev tools & concepts</td><td>Fast-paced overviews of tools (Docker, Kubernetes, APIs). Great for team onboarding.</td></tr><tr><td><a href="https://www.youtube.com/@hnasr" target="_blank">Hussein Nasser</a></td><td>Backend & infrastructure</td><td>Deep dives on databases, protocols, and backend design. Useful for data layer of your AI platform.</td></tr><tr><td><a href="https://www.youtube.com/@EngineeringwithUtsav" target="_blank">Engineering with Utsav</a></td><td>System design interviews</td><td>Practical system design thinking from an engineering perspective.</td></tr></table>
+---
+<h3>🏢 Enterprise AI & Applied ML</h3>
+<table><tr><th>Channel</th><th>Focus</th><th>Best For</th></tr><tr><td><a href="https://www.youtube.com/@aiexplained-official" target="_blank">AI Explained</a></td><td>AI news & implications</td><td>Balanced, well-researched AI developments for non-researchers. Good for leadership briefings.</td></tr><tr><td><a href="https://www.youtube.com/@matthew_berman" target="_blank">Matthew Berman</a></td><td>Open-source LLMs, tools</td><td>Reviews and demos of AI tools. Practical for evaluating what to use in your stack.</td></tr><tr><td><a href="https://www.youtube.com/@samwitteveenai" target="_blank">Sam Witteveen</a></td><td>LangChain, RAG, AI agents</td><td>Very applied. Directly useful for building AI workflows in an enterprise context.</td></tr><tr><td><a href="https://www.youtube.com/@DavidShapiroAutomator" target="_blank">David Shapiro</a></td><td>AI agents, autonomy</td><td>Forward-looking on agentic AI in enterprise settings.</td></tr><tr><td><a href="https://www.youtube.com/@AIJasonZ" target="_blank">AI Jason</a></td><td>No-code/low-code AI workflows</td><td>Practical automation with AI. Useful for showing business stakeholders what's possible quickly.</td></tr><tr><td><a href="https://www.youtube.com/@patloeber" target="_blank">Patrick Loeber (Python Engineer)</a></td><td>Python + ML tools</td><td>LangChain, PyTorch tutorials. Good for the technical team.</td></tr></table>
+---
+<h3>📊 Data, MLOps & AI Platform Engineering</h3>
+<table><tr><th>Channel</th><th>Focus</th><th>Best For</th></tr><tr><td><a href="https://www.youtube.com/@DataTalksClub" target="_blank">DataTalks.Club</a></td><td>MLOps, data engineering</td><td>MLOps Zoomcamp and similar courses. Covers the operational side of running ML in production.</td></tr><tr><td><a href="https://www.youtube.com/@madewithml" target="_blank">Made With ML</a></td><td>ML production & design</td><td>Goku Mohandas covers design patterns for ML systems.</td></tr><tr><td><a href="https://www.youtube.com/@WeightsBiases" target="_blank">Weights & Biases</a></td><td>Experiment tracking, LLMOps</td><td>How to build observable, reproducible AI systems.</td></tr><tr><td><a href="https://www.youtube.com/@chiphuyen" target="_blank">Chip Huyen</a></td><td>ML systems design</td><td>Author of <em>Designing Machine Learning Systems</em>. Critical for AI platform architecture thinking.</td></tr></table>
+---
+<h2>📚 Bonus: Newsletters & Blogs Worth Bookmarking</h2>
+<table><tr><th>Resource</th><th>Author</th><th>Format</th><th>Focus</th></tr><tr><td><a href="https://www.deeplearning.ai/the-batch/" target="_blank">The Batch</a></td><td>Andrew Ng</td><td>Weekly newsletter</td><td>Curated AI news + Andrew's editorial. Excellent for leadership.</td></tr><tr><td><a href="https://www.lennysnewsletter.com/" target="_blank">Lenny's Newsletter</a></td><td>Lenny Rachitsky</td><td>Newsletter</td><td>Product + AI strategy. Useful for AI platform product thinking.</td></tr><tr><td><a href="https://newsletter.pragmaticengineer.com/" target="_blank">Pragmatic Engineer</a></td><td>Gergely Orosz</td><td>Newsletter</td><td>Engineering management + system design.</td></tr><tr><td><a href="https://www.aisnakeoil.com/" target="_blank">AI Snake Oil</a></td><td>Arvind Narayanan</td><td>Blog/newsletter</td><td>Critical, research-backed AI skepticism. Essential for making honest claims about AI to leadership.</td></tr><tr><td><a href="https://magazine.sebastianraschka.com/" target="_blank">Ahead of AI</a></td><td>Sebastian Raschka</td><td>Newsletter</td><td>Deep technical LLM content monthly.</td></tr><tr><td><a href="https://simonwillison.net/" target="_blank">Simon Willison's Blog</a></td><td>Simon Willison</td><td>Blog</td><td>Daily practical AI building. One of the best hands-on AI builders online.</td></tr></table>
+---
+<h2>🗂️ How to Keep This Updated</h2>
+<ul><li><strong>Adding new accounts:</strong> Add a new row to the relevant table with handle, name, focus, and why you're following.</li>
+<li><strong>Tagging by team relevance:</strong> Consider adding a column like <code>Relevant To</code> (e.g., IT Architects, Data Team, Leadership) as the list grows.</li>
+<li><strong>Version log below:</strong></li>
+</ul>
+<h3>📅 Update Log</h3>
+<table><tr><th>Date</th><th>Update</th><th>Added By</th></tr><tr><td>2026-03-09</td><td>Initial list created — AI/LLM, System Design, Enterprise AI, YouTube channels</td><td>Hector</td></tr></table>
+---
+<em>Built as a foundation resource for the Organizational AI Platform initiative.</em></div></div>
+    </div>
+    <div class="page" id="page-projects">
+      <div class="page-header">
+        <h1>🗂️ Projects</h1>
+        <p>Active initiatives connected to the signal tracker via project tags.</p>
+      </div>
+      <div class="content-page"><div><h1>MES Modernization</h1>
+<strong>Status:</strong> Active — Proposal stage  
+<strong>Approach:</strong> Hybrid Composable Architecture  
+<strong>Timeline:</strong> 26-week four-phase program
+<h2>Objective</h2>
+<p>Replace the current LabVIEW-based MES with a modern, composable system that eliminates single-person dependency, reduces business continuity risk, and creates the data foundation required for the AI Platform.</p>
+<h2>Four Phases</h2>
+<table><tr><th>Phase</th><th>Focus</th><th>Outcome</th></tr><tr><td>1</td><td>Stabilization & Documentation</td><td>Risk mitigation, knowledge transfer</td></tr><tr><td>2</td><td>Data Layer Modernization</td><td>Clean, structured manufacturing data</td></tr><tr><td>3</td><td>Composable MES Core</td><td>Modular system, M3 integration</td></tr><tr><td>4</td><td>AI Platform Foundation</td><td>Data pipelines ready for ML</td></tr></table>
+<h2>Key Decisions</h2>
+<ul><li><strong>Architecture:</strong> Hybrid composable (not monolithic commercial MES, not full custom build)</li>
+<li><strong>ERP Integration:</strong> Infor M3 / MOVEX as source of truth</li>
+<li><strong>Change Management:</strong> Prosci ADKAR model</li>
+</ul>
+<h2>Signals to Watch</h2>
+<p>Filter the Signal Tracker by <code>digital-transformation</code> to see all relevant captured insights.</p>
+<h2>Links</h2>
+<ul><li>Related project: [[ai-platform-roadmap]]</li>
+<li>Related project: [[m3-erp-integration]]</li>
+</ul></div><hr style="border-color:var(--border);margin:2rem 0"><div><h1>M3 / ERP Integration</h1>
+<strong>Status:</strong> Active — Planning  
+<strong>System:</strong> Infor M3 (MOVEX)
+<h2>Objective</h2>
+<p>Establish clean, reliable integration patterns between the modernized MES and M3/Infor, making ERP data accessible to the AI Platform without creating brittle point-to-point connections.</p>
+<h2>Integration Principles</h2>
+<ul><li><strong>API-first</strong> — avoid direct DB integrations where possible</li>
+<li><strong>Event-driven</strong> — favor pub/sub over polling</li>
+<li><strong>Decoupled</strong> — MES and ERP changes should not cascade</li>
+</ul>
+<h2>Key Integration Points</h2>
+<table><tr><th>Data Domain</th><th>Direction</th><th>Priority</th></tr><tr><td>Production orders</td><td>M3 → MES</td><td>High</td></tr><tr><td>Work center status</td><td>MES → M3</td><td>High</td></tr><tr><td>Quality events</td><td>MES → M3</td><td>Medium</td></tr><tr><td>Inventory updates</td><td>Bidirectional</td><td>Medium</td></tr></table>
+<h2>Signals to Watch</h2>
+<p>Filter the Signal Tracker by <code>m3-erp-integration</code> for all relevant intelligence on ERP integration patterns, Infor APIs, and event-driven architectures.</p></div><hr style="border-color:var(--border);margin:2rem 0"><div><h1>AI Platform Roadmap</h1>
+<strong>Status:</strong> Active — Strategy & Foundation  
+<strong>Dependency:</strong> MES Modernization (data layer prerequisite)
+<h2>Objective</h2>
+<p>Build an organizational AI platform that augments manufacturing operations, integrates with M3/ERP, and delivers measurable value — starting with the data foundation unlocked by MES modernization.</p>
+<h2>Platform Components (Target Architecture)</h2>
+<table><tr><th>Layer</th><th>Component</th><th>Notes</th></tr><tr><td>Data</td><td>Clean manufacturing event stream</td><td>Output of MES Phase 2</td></tr><tr><td>Inference</td><td>LLM / ML model layer</td><td>To be evaluated</td></tr><tr><td>Integration</td><td>M3/ERP connectors</td><td>Phase 3 dependency</td></tr><tr><td>Applications</td><td>Use-case specific agents</td><td>TBD by business need</td></tr><tr><td>Governance</td><td>Eval, monitoring, access control</td><td>Build from day one</td></tr></table>
+<h2>Candidate Use Cases</h2>
+<ul><li>Predictive maintenance signals from MES data</li>
+<li>M3 data querying via natural language</li>
+<li>Document intelligence (SOPs, quality docs)</li>
+<li>Operational reporting automation</li>
+</ul>
+<h2>Principles</h2>
+<p>1. <strong>Data before models</strong> — clean data is the prerequisite 2. <strong>Composable over monolithic</strong> — same principle as MES approach 3. <strong>Governance from day one</strong> — not bolted on later 4. <strong>Build on proven patterns</strong> — RAG, not fine-tuning, for enterprise knowledge</p>
+<h2>Signals to Watch</h2>
+<p>Filter the Signal Tracker by <code>ai-platform</code> for all relevant intelligence.</p></div></div>
+    </div>
+    <div class="page" id="page-concepts">
+      <div class="page-header">
+        <h1>💡 Concepts</h1>
+        <p>Evergreen technical patterns and frameworks for your AI platform work.</p>
+      </div>
+      <div class="content-page"><div><h1>RAG (Retrieval-Augmented Generation) for Enterprise</h1>
+<h2>What It Is</h2>
+<p>RAG is a pattern where an LLM's response is grounded in retrieved documents from your own knowledge base — rather than relying purely on what the model was trained on. The model retrieves relevant context, then generates a response using that context.</p>
+<h2>Why This Is the Right Pattern for Your AI Platform</h2>
+<p>For a manufacturing org integrating AI with M3/ERP and MES data:</p>
+<ul><li><strong>Fine-tuning is expensive and fragile</strong> — every data update requires retraining</li>
+<li><strong>RAG uses your live data</strong> — query your actual M3 records, SOPs, quality docs</li>
+<li><strong>Auditable</strong> — you can see which documents were retrieved to answer a question</li>
+<li><strong>Safer for enterprise</strong> — model stays generic, your data stays in your systems</li>
+</ul>
+<h2>Basic Architecture</h2>
+<p>``<code> User Query     ↓ Embedding Model → Vector Search → Retrieved Documents                                         ↓                               LLM + Retrieved Context                                         ↓                                Grounded Response </code>`<code></p>
+<h2>Key Components to Build</h2>
+<table><tr><th>Component</th><th>Purpose</th><th>Tool Options</th></tr><tr><td>Document ingestion</td><td>Parse SOPs, M3 exports, MES logs</td><td>Unstructured, LlamaIndex</td></tr><tr><td>Embedding model</td><td>Convert text to vectors</td><td>OpenAI, local models</td></tr><tr><td>Vector store</td><td>Index and retrieve embeddings</td><td>Chroma, Pinecone, pgvector</td></tr><tr><td>LLM</td><td>Generate grounded response</td><td>Claude, GPT-4, local models</td></tr><tr><td>Eval layer</td><td>Measure answer quality</td><td>RAGAS, custom evals</td></tr></table>
+<h2>Connection to MES Modernization</h2>
+<p>MES Phase 2 (data layer modernization) is the prerequisite — clean, structured event data can be indexed into the RAG pipeline, enabling queries like "What were the top quality failures on Line 3 last week?" answered by the AI, grounded in real data.</p>
+<h2>Signals to Watch</h2>
+<p>Filter tracker by </code>ai-platform` + search "RAG"</p></div><hr style="border-color:var(--border);margin:2rem 0"><div><h1>Composable Architecture</h1>
+<h2>What It Is</h2>
+<p>A design approach where systems are built from loosely coupled, independently deployable components that can be assembled and reassembled to meet changing business needs — as opposed to monolithic systems where everything is tightly coupled.</p>
+<h2>Why It Matters for Your Work</h2>
+<p>The hybrid composable MES recommendation uses this principle: rather than buying a full commercial MES suite or building everything custom, you compose purpose-built modules around a data backbone. The same principle applies to the AI Platform — modular inference, modular data connectors, modular applications.</p>
+<h2>Key Patterns</h2>
+<ul><li><strong>Event-driven integration</strong> — components communicate via events, not direct calls</li>
+<li><strong>API contracts</strong> — each module exposes a defined interface</li>
+<li><strong>Domain isolation</strong> — MES quality module doesn't need to know about M3 directly</li>
+<li><strong>Independent deployability</strong> — update one module without redeploying everything</li>
+</ul>
+<h2>Relevant for SME Manufacturers</h2>
+<p>Research-backed positioning: composable/modular MES architectures are optimal for SME manufacturers because: 1. Lower upfront cost than full commercial suites 2. Can phase implementation (start with highest-risk areas) 3. Avoid vendor lock-in at the system level 4. Each module can be replaced without wholesale system change</p>
+<h2>Related Signals</h2>
+<p>Filter tracker by <code>digital-transformation</code> + search "composable"</p>
+<h2>Further Reading</h2>
+<ul><li>Martin Fowler: Strangler Fig Pattern (gradual replacement of legacy systems)</li>
+<li>Gartner: Composable Enterprise</li>
+<li>ThoughtWorks: Evolutionary Architecture</li>
+</ul></div></div>
+    </div>
+    <div class="build-info">
+      Auto-generated from markdown · Built 2026-03-09 · Push to main → auto-deploys via GitHub Actions
+    </div>
+  </main>
+</div>
+<script>
+  const navLinks = document.querySelectorAll('.nav-link');
+  const pages = document.querySelectorAll('.page');
+  function showPage(id) {
+    pages.forEach(p => p.classList.remove('active'));
+    navLinks.forEach(l => l.classList.remove('active'));
+    const t = document.getElementById('page-' + id);
+    if (t) t.classList.add('active');
+    navLinks.forEach(l => { if (l.dataset.page === id) l.classList.add('active'); });
+  }
+  navLinks.forEach(l => l.addEventListener('click', () => {
+    showPage(l.dataset.page);
+    if (l.dataset.filter) setTimeout(() => {
+      const b = document.querySelector(`.filter-btn[data-filter="${l.dataset.filter}"]`);
+      if (b) b.click();
+    }, 50);
+  }));
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const cards = document.querySelectorAll('.signal-card');
+  let activeFilter = 'all', searchTerm = '';
+  function applyFilters() {
+    cards.forEach(c => {
+      const proj = c.dataset.project || '', tags = c.dataset.tags || '', text = c.textContent.toLowerCase();
+      const matchF = activeFilter === 'all' || proj === activeFilter || tags.includes(activeFilter);
+      const matchS = !searchTerm || text.includes(searchTerm.toLowerCase());
+      c.style.display = matchF && matchS ? 'block' : 'none';
+    });
+  }
+  filterBtns.forEach(b => b.addEventListener('click', () => {
+    filterBtns.forEach(x => x.classList.remove('active'));
+    b.classList.add('active');
+    activeFilter = b.dataset.filter;
+    applyFilters();
+  }));
+  document.getElementById('signal-search').addEventListener('input', e => {
+    searchTerm = e.target.value;
+    applyFilters();
+  });
+</script>
+</body>
+</html>
