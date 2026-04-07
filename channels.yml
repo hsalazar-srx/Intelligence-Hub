@@ -12,106 +12,171 @@
 #                 Options: ai-platform | digital-transformation | m3-erp-integration | general
 #   priority:     high | medium | low (affects processing order, not filtering)
 #   notes:        Why this channel is in the list (for future team members)
+#
+# Verification status legend:
+#   ✅ VERIFIED   — channel_id confirmed via Wikidata, NoxInfluencer, Playboard, or SocialBlade
+#   ⚠️ UNVERIFIED — channel_id not independently confirmed; validate by visiting
+#                  youtube.com/@handle → right-click → View Page Source → Ctrl+F "channelId"
 # ─────────────────────────────────────────────────────────────────
 
 channels:
 
-  # ── AI & LLM Research ───────────────────────────────────────
+  # ════════════════════════════════════════════════════════════════
+  # AI & LLM RESEARCH
+  # ════════════════════════════════════════════════════════════════
+
   - name: "Andrej Karpathy"
-    channel_id: "UCbmNph6atAoGfqLoCL_duAg"
+    channel_id: "UCXUPKJO5MZQN11PqgIvyuvQ"  # ✅ VERIFIED (Wikidata) — corrected from previous version
     project_hint: "ai-platform"
     priority: high
-    notes: "Neural nets from first principles. Essential for understanding what the team is building on."
+    notes: "Neural nets from first principles. Zero to Hero series is essential for understanding what the team is building on."
+
+  - name: "3Blue1Brown"
+    channel_id: "UCYO_jab_esuFRV4b17AJtAw"  # ✅ VERIFIED (Wikidata)
+    project_hint: "ai-platform"
+    priority: high
+    notes: "Mathematical intuition behind transformers and attention via animation. Essential for team members who need to understand why, not just how."
 
   - name: "Yannic Kilcher"
-    channel_id: "UCZd-5UsUpzeAfZl-Om5mzbA"
+    channel_id: "UCHmD-oSpV0sNfAUnpYpj8KA"   # ✅ VERIFIED (Manually)
     project_hint: "ai-platform"
     priority: high
-    notes: "Deep ML paper walkthroughs. Good for understanding landmark models."
+    notes: "Deep ML paper walkthroughs. Good for understanding landmark models (GPT, BERT, etc)."
 
   - name: "Sebastian Raschka"
-    channel_id: "UCTe7kFPJSr8JVKMFM8RKQBA"
+    channel_id: "UC_CzsS7UTjcxJ-xXp1ftxtA"  # ✅ VERIFIED (Manually)
     project_hint: "ai-platform"
     priority: high
-    notes: "LLM fundamentals, companion to Build a Large Language Model From Scratch."
+    notes: "LLM fundamentals. Companion to Build a Large Language Model From Scratch. Rigorous and code-grounded."
 
   - name: "Umar Jamil"
-    channel_id: "UC7_d3JDOqBtF5IzhKSEGMQQ"
+    channel_id: "UC7_d3JDOqBtF5IzhKSEGMQQ"  # ⚠️ UNVERIFIED — confirm at youtube.com/@umarjamilai
     project_hint: "ai-platform"
     priority: medium
-    notes: "Implements transformers, RAG, and more from scratch in code."
+    notes: "Implements transformers, RAG, and more from scratch in code. Good for technical team members."
 
   - name: "Two Minute Papers"
-    channel_id: "UCbfYPyITQ-7l4upoX8nvctg"
+    channel_id: "UCbfYPyITQ-7l4upoX8nvctg"  # ✅ VERIFIED (Wikidata)
     project_hint: "ai-platform"
     priority: medium
-    notes: "Fast accessible summaries of AI research. Good for staying current."
+    notes: "Fast accessible summaries of AI research. Good for staying current without reading papers."
 
-  # ── Applied AI & Enterprise ──────────────────────────────────
+  - name: "Google DeepMind"
+    channel_id: "UCP7jMXSY2xbc3KCAE0MHQ-A"  # ✅ VERIFIED (Wikidata)
+    project_hint: "ai-platform"
+    priority: medium
+    notes: "Primary AI research lab behind AlphaFold, Gemini, and frontier safety work. Direct signal on where large-scale AI is heading."
+
+  - name: "DeepLearning.AI"
+    channel_id: "UCcIXc5mJsHVYTZR1IBKqcuQ"  # ⚠️ UNVERIFIED — confirm at youtube.com/@deeplearningai
+    project_hint: "ai-platform"
+    priority: high
+    notes: "Andrew Ng's channel. Structured courses on ML, deep learning, MLOps, and GenAI. Ideal for team upskilling and leadership briefings."
+
+  # ════════════════════════════════════════════════════════════════
+  # APPLIED AI & ENTERPRISE
+  # ════════════════════════════════════════════════════════════════
+
+  - name: "Lex Fridman"
+    channel_id: "UCSHZKyawb77ixDdsGog4iWA"  # ✅ VERIFIED (Wikidata)
+    project_hint: "ai-platform"
+    priority: medium
+    notes: "Long-form interviews with top AI researchers, founders, and scientists. Good for strategy context and understanding the frontier."
+
+  - name: "IBM Technology"
+    channel_id: "UCKWaEZ-_VweaEx1j62do_vQ"  # ✅ VERIFIED (NoxInfluencer + Playboard)
+    project_hint: "digital-transformation"
+    priority: high
+    notes: "Enterprise AI, automation, cybersecurity, and hybrid cloud explainers. Highly relevant for manufacturing and ERP digital transformation context."
+
   - name: "Sam Witteveen"
-    channel_id: "UCFSiKDJiWBl7bFvuNOQFNrg"
+    channel_id: "UCFSiKDJiWBl7bFvuNOQFNrg"  # ⚠️ UNVERIFIED — confirm at youtube.com/@samwitteveenai
     project_hint: "ai-platform"
     priority: high
     notes: "LangChain, RAG, AI agents — very applied, directly useful for enterprise AI workflows."
 
   - name: "Matthew Berman"
-    channel_id: "UCpr87WLfDFRpHrBOFkMlZCQ"
+    channel_id: "UCpr87WLfDFRpHrBOFkMlZCQ"  # ⚠️ UNVERIFIED — confirm at youtube.com/@matthew_berman
     project_hint: "ai-platform"
     priority: medium
-    notes: "Open-source LLM reviews and demos. Good for evaluating tools."
+    notes: "Open-source LLM reviews and demos. Good for evaluating tools for the AI platform stack."
 
   - name: "AI Explained"
-    channel_id: "UCNJ1Ymd5yFuUPtn21xtRbbw"
+    channel_id: "UCNJ1Ymd5yFuUPtn21xtRbbw"  # ⚠️ UNVERIFIED — confirm at youtube.com/@aiexplained-official
     project_hint: "ai-platform"
     priority: medium
-    notes: "Balanced, well-researched AI developments. Good for leadership briefings."
+    notes: "Balanced, well-researched AI developments. Good for leadership briefings — avoids hype."
 
   - name: "David Shapiro"
-    channel_id: "UCwxlzEVMlJVXB-6a4ej8KoQ"
+    channel_id: "UCwxlzEVMlJVXB-6a4ej8KoQ"  # ⚠️ UNVERIFIED — confirm at youtube.com/@DavidShapiroAutomator
     project_hint: "ai-platform"
     priority: medium
-    notes: "AI agents and autonomy in enterprise settings."
+    notes: "AI agents and autonomy in enterprise settings. Forward-looking on agentic workflows."
 
-  # ── System Design & Architecture ────────────────────────────
+  # ════════════════════════════════════════════════════════════════
+  # SYSTEM DESIGN & ARCHITECTURE
+  # ════════════════════════════════════════════════════════════════
+
   - name: "ByteByteGo"
-    channel_id: "UCZgt6AzoyjslHTC9dz0UoTw"
+    channel_id: "UCZgt6AzoyjslHTC9dz0UoTw"  # ✅ VERIFIED (SocialBlade)
     project_hint: "digital-transformation"
     priority: high
-    notes: "System design patterns — directly applicable to AI platform and MES architecture."
+    notes: "System design patterns — directly applicable to AI platform and MES composable architecture."
 
   - name: "Fireship"
-    channel_id: "UCsBjURrPoezykLs9EqgamOA"
+    channel_id: "UCsBjURrPoezykLs9EqgamOA"  # ✅ VERIFIED (SocialBlade)
     project_hint: "digital-transformation"
     priority: medium
-    notes: "Fast-paced overviews of modern dev tools. Good for team onboarding."
+    notes: "Fast-paced overviews of modern dev tools and concepts. Good for team onboarding."
 
   - name: "Hussein Nasser"
-    channel_id: "UC_ML5jCFl4bCKOf1KKjOfSg"
+    channel_id: "UC_ML5xP23TOWKUcc-oAE_Eg"  # ✅ VERIFIED (NoxInfluencer) — corrected from previous version
     project_hint: "digital-transformation"
     priority: medium
-    notes: "Backend and infrastructure deep dives. Useful for data layer of AI platform."
+    notes: "Backend and infrastructure deep dives — protocols, databases, proxies. Useful for data layer of the AI platform."
 
-  # ── MLOps & Data Engineering ─────────────────────────────────
-  - name: "DataTalks.Club"
-    channel_id: "UCDvErgK0j5ur3whLDk-xxOA"
-    project_hint: "ai-platform"
-    priority: high
-    notes: "MLOps Zoomcamp and courses. Covers the operational side of running ML in production."
-
-  - name: "Weights & Biases"
-    channel_id: "UCBdu5TP3A8NLkwXYABtJQFQ"
-    project_hint: "ai-platform"
-    priority: medium
-    notes: "Experiment tracking and LLMOps. How to build observable, reproducible AI systems."
-
-  - name: "Patrick Loeber (Python Engineer)"
-    channel_id: "UCbXgNpp0jedKWclzcgMLdjg"
-    project_hint: "ai-platform"
-    priority: medium
-    notes: "LangChain, PyTorch tutorials. Good for the technical team."
-
-  - name: "AI Jason"
-    channel_id: "UCv9CRVWFNlWzAJLxqHGkG4A"
+  - name: "Engineering with Utsav"
+    channel_id: "UCgxfVOCEFMGEqSHgDOPnHhA"  # ⚠️ UNVERIFIED — confirm at youtube.com/@EngineeringwithUtsav
     project_hint: "digital-transformation"
     priority: low
-    notes: "AI automation workflows. Useful for showing business stakeholders what's possible quickly."
+    notes: "Practical system design thinking from an engineering perspective."
+
+  # ════════════════════════════════════════════════════════════════
+  # MLOps, DATA ENGINEERING & AI PLATFORM OPS
+  # ════════════════════════════════════════════════════════════════
+
+  - name: "DataTalks.Club"
+    channel_id: "UCDvErgK0j5ur3whLDk-xxOA"  # ⚠️ UNVERIFIED — confirm at youtube.com/@DataTalksClub
+    project_hint: "ai-platform"
+    priority: high
+    notes: "MLOps Zoomcamp and data engineering courses. Covers the operational side of running ML in production — directly maps to AI platform governance needs."
+
+  - name: "Made With ML"
+    channel_id: "UC4_g3PGjgU0EM3gFmkNSNRg"  # ⚠️ UNVERIFIED — confirm at youtube.com/@madewithml
+    project_hint: "ai-platform"
+    priority: medium
+    notes: "Goku Mohandas covers ML system design patterns and production best practices. Good for AI platform architecture thinking."
+
+  - name: "Weights & Biases"
+    channel_id: "UCBdu5TP3A8NLkwXYABtJQFQ"  # ⚠️ UNVERIFIED — confirm at youtube.com/@WeightsBiases
+    project_hint: "ai-platform"
+    priority: medium
+    notes: "Experiment tracking, LLMOps, and model observability. How to build reproducible, auditable AI systems."
+
+  - name: "Chip Huyen"
+    channel_id: "UC01lEoL9G0hgYQMUr9Nj1gw"  # ⚠️ UNVERIFIED — confirm at youtube.com/@chiphuyen
+    project_hint: "ai-platform"
+    priority: high
+    notes: "Author of Designing Machine Learning Systems. Critical thinking on AI platform architecture — covers real-world deployment, not just theory."
+
+  - name: "Patrick Loeber (Python Engineer)"
+    channel_id: "UCbXgNpp0jedKWclzcgMLdjg"  # ⚠️ UNVERIFIED — confirm at youtube.com/@patloeber
+    project_hint: "ai-platform"
+    priority: medium
+    notes: "LangChain, PyTorch, and applied ML tutorials. Good for the technical implementation team."
+
+  - name: "AI Jason"
+    channel_id: "UCv9CRVWFNlWzAJLxqHGkG4A"  # ⚠️ UNVERIFIED — confirm at youtube.com/@AIJasonZ
+    project_hint: "digital-transformation"
+    priority: low
+    notes: "AI automation workflows and no-code/low-code demos. Useful for showing business stakeholders what's possible quickly."
